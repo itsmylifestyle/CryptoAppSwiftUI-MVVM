@@ -8,11 +8,40 @@
 import Foundation
 import Combine
 
+@MainActor
 class CryptoListViewModel : ObservableObject {
     
     let webservice = Webservice()
     @Published var cryptoList = [CryptoViewModel]()
     
+    
+    func downloadCryptosCont(url : URL) async {
+        do {
+            let ctyptos = try await webservice.downloadcurrenciesContinuation(url: url)
+            self.cryptoList = ctyptos.map(CryptoViewModel.init)
+            
+            /*DispatchQueue.main.async {
+                self.cryptoList = ctyptos.map(CryptoViewModel.init)
+            }*/ //we removed it because I used @MainActor and this helps ...(check your notes)
+        } catch {
+            print(error)
+        }
+    }
+    
+    /* SECOND SCENARIO
+    func downloadCryptoAsync(url : URL) async {
+        do {
+            let cryptos = try await webservice.downloadCurrenciesAsyns(url: url)
+            DispatchQueue.main.async {
+                self.cryptoList = cryptos.map(CryptoViewModel.init)
+            }
+        } catch {
+            print(error)
+        }
+    }
+     */
+    
+    /*  FIRST SCENARIO 
     func downloadCryptos(url : URL) {
         webservice.downloadCurrencies(url: url) { res in
             switch res {
@@ -27,7 +56,10 @@ class CryptoListViewModel : ObservableObject {
                 }
             }
         }
-    }
+     }
+     */
+    
+    
     
 }
 
